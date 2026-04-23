@@ -1,5 +1,7 @@
-.env
+my_django_project/.env
 __pycache__/
 db.sqlite3
 .idea/
 .venv/
+.env
+.env/
