@@ -1,13 +1,26 @@
 from django.shortcuts import render, redirect
-from .models import ContactMessage
+from django.contrib import messages
+from .models import ContactMessage, GeneralSetting, ImageSetting, Experience, Education, Skill, SocialMedia
 
 
-# 1. Senin o dünkü muazzam ana sayfanı ayağa kaldıran fonksiyon
 def index(request):
-    return render(request, 'index.html')
+    settings = GeneralSetting.objects.all()
+
+    settings_dict = {}
+    for setting in settings:
+        settings_dict[setting.name] = setting.parameter
+
+    context = {
+        'settings': settings_dict,
+        'images': ImageSetting.objects.all(),
+        'experiences': Experience.objects.all(),
+        'educations': Education.objects.all(),
+        'skills': Skill.objects.all(),
+        'social_medias': SocialMedia.objects.all(),
+    }
+    return render(request, 'index.html', context=context)
 
 
-# 2. En alta eklediğimiz formdan gelen mesajları veritabanına kaydeden motor fonksiyon
 def contact_form(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -15,14 +28,13 @@ def contact_form(request):
         subject = request.POST.get('subject')
         message = request.POST.get('message')
 
-        # Verileri veritabanı tablosuna yazıyoruz
         ContactMessage.objects.create(
             name=name,
             email=email,
             subject=subject,
             message=message
         )
-        # Mesaj kaydedilince sayfayı pürüzsüzce ana sayfaya geri atıyoruz
+        messages.success(request, 'Your message has been sent successfully!')
         return redirect('index')
 
     return redirect('index')
